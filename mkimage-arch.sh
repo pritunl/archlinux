@@ -14,8 +14,19 @@ hash expect &> /dev/null || {
     exit 1
 }
 
+REPO_DATE=$1
 ROOTFS=$(mktemp -d ${TMPDIR:-/var/tmp}/rootfs-archlinux-XXXXXXXXXX)
 chmod 755 $ROOTFS
+
+echo $REPO_DATE | grep -q . || {
+    echo "Must supply repo date"
+    exit 1
+}
+
+curl -o /dev/null --silent --head --write-out '%{http_code}' 'http://mirror.pritunl.com/archlinux/'$REPO_DATE'/' | grep -q 200 || {
+    echo 'Could not verify mirror. http://mirror.pritunl.com/archlinux/'$REPO_DATE'/'
+    exit 1
+}
 
 # packages to ignore for space savings
 PKGIGNORE=(
@@ -65,7 +76,7 @@ arch-chroot $ROOTFS /bin/sh -c "haveged -w 1024; pacman-key --init; pkill havege
 arch-chroot $ROOTFS /bin/sh -c "ln -s /usr/share/zoneinfo/UTC /etc/localtime"
 echo 'en_US.UTF-8 UTF-8' > $ROOTFS/etc/locale.gen
 arch-chroot $ROOTFS locale-gen
-arch-chroot $ROOTFS /bin/sh -c 'echo "Server = http://mirrors.rutgers.edu/archlinux/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist'
+arch-chroot $ROOTFS /bin/sh -c 'echo "Server = http://mirror.pritunl.com/archlinux/'$REPO_DATE'/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist'
 
 # udev doesn't work in containers, rebuild /dev
 DEV=$ROOTFS/dev
@@ -86,5 +97,5 @@ mknod -m 666 $DEV/ptmx c 5 2
 ln -sf /proc/self/fd $DEV/fd
 
 tar --numeric-owner --xattrs --acls -C $ROOTFS -c . | docker import - pritunl/archlinux
-docker run -rm -t pritunl/archlinux echo Success.
+docker run --rm -t pritunl/archlinux echo Success.
 rm -rf $ROOTFS
