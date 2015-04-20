@@ -81,10 +81,7 @@ for args in repo_args:
     if not os.path.exists(args[-1]):
         os.makedirs(args[-1])
 
-    try:
-        subprocess.check_call(args)
-    except subprocess.CalledProcessError:
-        raise
+    subprocess.check_call(args)
 
 os.remove(os.path.join(MIRROR_DEST_ROOT, 'latest'))
 subprocess.check_call(['ln', '-s',
@@ -95,6 +92,7 @@ subprocess.check_call(['ln', '-s',
 src_dir = get_latest_mirror()
 for repo in ['core', 'extra', 'community']:
     path = os.path.join(src_dir, repo, 'os/x86_64')
+
     for pkg_name in os.listdir(path):
         if pkg_name.endswith('sig'):
             continue
