@@ -13,8 +13,7 @@ const body = `<html>
 <head><title>Index of %s</title></head>
 <body bgcolor="white">
 <h1>Index of %s</h1><hr><pre><a href="../">../</a>
-%s
-</pre><hr></body>
+%s</pre><hr></body>
 </html>
 `
 
