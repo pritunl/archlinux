@@ -25,7 +25,7 @@ def get_latest_mirror():
     return path
 
 src_dir = get_latest_mirror()
-for repo in ['core', 'extra', 'community']:
+for repo in ['core', 'extra', 'community', 'multilib']:
     path = os.path.join(src_dir, repo, 'os/x86_64')
     for pkg_name in os.listdir(path):
         if pkg_name.endswith('sig'):
