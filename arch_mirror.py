@@ -40,13 +40,14 @@ base_args = [
     '--delete-excluded',
     '--exclude=.*',
     '--hard-links',
+    '--ignore-errors',
 ]
 
 repo_args = []
 
 print '***************************************************'
 
-for repo in ['core', 'extra', 'community']:
+for repo in ['core', 'extra', 'community', 'multilib']:
     args = list(base_args)
 
     source = MIRROR_SOURCE_ROOT + '/%s/os/x86_64/' % repo
@@ -90,7 +91,7 @@ subprocess.check_call(['ln', '-s',
 ])
 
 src_dir = get_latest_mirror()
-for repo in ['core', 'extra', 'community']:
+for repo in ['core', 'extra', 'community', 'multilib']:
     path = os.path.join(src_dir, repo, 'os/x86_64')
 
     for pkg_name in os.listdir(path):
